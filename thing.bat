@@ -5,8 +5,8 @@ REM ==========================================================
 REM CONFIGURE AQUI
 REM ==========================================================
 set "PC=10.139.127.29"
-set "USER=aluno"
-set "SCRIPT=troll.pyw"
+set "USER=tarde.cetafaju"
+set "SCRIPT=projeto pica.pyw"
 set "REMOTE_DIR=C:/Users/%USER%/Desktop"
 
 REM Tudo depois do nome do .bat será passado para o Python.
