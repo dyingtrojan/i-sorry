@@ -1,78 +1,77 @@
-@echo off
-setlocal EnableDelayedExpansion
+#!/bin/bash
 
-REM ==========================================================
-REM CONFIGURE AQUI
-REM ==========================================================
-set "PC=10.139.127.29"
-set "USER=tarde.cetafaju"
-set "SCRIPT=projeto pica.pyw"
-set "REMOTE_DIR=C:/Users/%USER%/Desktop"
+# ==========================================================
+# CONFIGURE AQUI
+# ==========================================================
+PC="10.139.127.29"
+USER="tarde.cetafaju"
+PORTA="2222"
+SCRIPT="projeto pica.pyw"
+REMOTE_DIR="/c/Users/$USER/Desktop"
 
-REM Tudo depois do nome do .bat será passado para o Python.
-REM Exemplo:
-REM executar.bat 300 8
-REM ==========================================================
+# ==========================================================
 
-echo.
-echo ==========================================
-echo       PREPARANDO MAQUINA REMOTA
-echo ==========================================
-echo.
+echo ""
+echo "=========================================="
+echo "       PREPARANDO MAQUINA REMOTA"
+echo "=========================================="
+echo ""
 
-echo [1/5] Verificando Python...
+echo "[1/5] Verificando Python..."
+ssh -p "$PORTA" "$USER@$PC" "py --version" >/dev/null 2>&1
 
-ssh "%USER%@%PC%" "py --version" >nul 2>&1
+if [ $? -ne 0 ]; then
+    echo "Python nao encontrado. Tentando instalar via winget..."
+    ssh -p "$PORTA" "$USER@$PC" "winget install --id Python.Python.3.13 -e --accept-source-agreements --accept-package-agreements"
+    
+    if [ $? -ne 0 ]; then
+        echo "[ERRO] Nao foi possivel instalar o Python."
+        read -p "Pressione Enter para sair..."
+        exit 1
+    fi
+    echo "Python instalado."
+fi
 
-if errorlevel 1 (
-    echo Python nao encontrado. Tentando instalar via winget...
+echo ""
+echo "[2/5] Verificando PyAutoGUI..."
+ssh -p "$PORTA" "$USER@$PC" "py -c \"import pyautogui\"" >/dev/null 2>&1
 
-    ssh -p 2222 "%USER%@%PC%" "winget install --id Python.Python.3.13 -e --accept-source-agreements --accept-package-agreements"
+if [ $? -ne 0 ]; then
+    echo "PyAutoGUI nao encontrado. Instalando..."
+    ssh -p "$PORTA" "$USER@$PC" "py -m pip install --user pyautogui pygame"
+    
+    if [ $? -ne 0 ]; then
+        echo "[ERRO] Falha ao instalar PyAutoGUI."
+        read -p "Pressione Enter para sair..."
+        exit 1
+    fi
+else
+    echo "PyAutoGUI ja esta instalado."
+fi
 
-    if errorlevel 1 (
-        echo [ERRO] Nao foi possivel instalar o Python.
-        pause
-        exit /b 1
-    )
+echo ""
+echo "[3/5] Copiando script..."
+scp -P "$PORTA" "$SCRIPT" "$USER@$PC:$REMOTE_DIR/$SCRIPT"
 
-    echo Python instalado.
-)
+if [ $? -ne 0 ]; then
+    echo "[ERRO] Falha ao copiar $SCRIPT."
+    read -p "Pressione Enter para sair..."
+    exit 1
+fi
 
-echo.
-echo [2/5] Verificando PyAutoGUI...
+echo ""
+echo "[4/5] Preparando argumentos..."
+ARGS="$@"
+echo "Argumentos: $ARGS"
 
-ssh -p 2222 "%USER%@%PC%" "py -c ""import pyautogui""" >nul 2>&1
+echo ""
+echo "[5/5] Executando remotamente..."
+ssh -p "$PORTA" "$USER@$PC" "start pyw.exe \"C:/Users/$USER/Desktop/$SCRIPT\" $ARGS"
 
-if errorlevel 1 (
-    echo PyAutoGUI nao encontrado. Instalando...
+echo ""
+echo "=========================================="
+echo "             EXECUCAO ENVIADA"
+echo "=========================================="
+echo ""
 
-    ssh "%USER%@%PC%" "py -m pip install --user pyautogui pygame"
-
-    if errorlevel 1 (
-        echo [ERRO] Falha ao instalar PyAutoGUI.
-        pause
-        exit /b 1
-    )
-) else (
-    echo PyAutoGUI ja esta instalado.
-)
-
-echo.
-echo [4/5] Preparando argumentos...
-
-set "ARGS=%*"
-
-echo Argumentos: %ARGS%
-
-echo.
-echo [5/5] Executando remotamente...
-
-ssh -p 2222 "%USER%@%PC%" "start "" pyw.exe %REMOTE_DIR%/%SCRIPT% %ARGS%"
-
-echo.
-echo ==========================================
-echo             EXECUCAO ENVIADA
-echo ==========================================
-echo.
-
-pause
+read -p "Pressione Enter para finalizar..."
