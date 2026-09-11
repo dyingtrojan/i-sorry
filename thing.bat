@@ -4,7 +4,7 @@ setlocal EnableDelayedExpansion
 REM ==========================================================
 REM CONFIGURE AQUI
 REM ==========================================================
-set "PC=192.168.1.100"
+set "PC=10.139.127.29"
 set "USER=aluno"
 set "SCRIPT=troll.pyw"
 set "REMOTE_DIR=C:/Users/%USER%/Desktop"
