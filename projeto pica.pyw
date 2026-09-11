@@ -10,7 +10,7 @@ import tkinter as tk
 # ---------------------------------------------------------------
 # CONFIGURAÇÕES — ajuste o nível de trollagem aqui
 # ---------------------------------------------------------------
-DURACAO_TOTAL_SEGUNDOS = 300000      # quanto tempo a trollagem dura
+DURACAO_TOTAL_SEGUNDOS = 3      # quanto tempo a trollagem dura
 QTD_POPUPS = 8                   # quantos popups de erro falso aparecem
 MEXER_MOUSE = True                # mouse anda sozinho
 ABRIR_SITE_ENGRACADO = True       # abre aba no navegador
@@ -339,4 +339,4 @@ if __name__ == "__main__":
     #     rodar_em_loop_aleatorio()
     #
     # Troque a linha abaixo conforme o que você quiser:
-    rodar_em_loop_aleatorio(intervalo_min_seg=300, intervalo_max_seg=1800)
+    rodar_em_loop_aleatorio(intervalo_min_seg=5, intervalo_max_seg=30)
