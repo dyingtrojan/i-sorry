@@ -27,7 +27,7 @@ ssh "%USER%@%PC%" "py --version" >nul 2>&1
 if errorlevel 1 (
     echo Python nao encontrado. Tentando instalar via winget...
 
-    ssh "%USER%@%PC%" "winget install --id Python.Python.3.13 -e --accept-source-agreements --accept-package-agreements"
+    ssh -p 2222 "%USER%@%PC%" "winget install --id Python.Python.3.13 -e --accept-source-agreements --accept-package-agreements"
 
     if errorlevel 1 (
         echo [ERRO] Nao foi possivel instalar o Python.
@@ -41,7 +41,7 @@ if errorlevel 1 (
 echo.
 echo [2/5] Verificando PyAutoGUI...
 
-ssh "%USER%@%PC%" "py -c ""import pyautogui""" >nul 2>&1
+ssh -p 2222 "%USER%@%PC%" "py -c ""import pyautogui""" >nul 2>&1
 
 if errorlevel 1 (
     echo PyAutoGUI nao encontrado. Instalando...
@@ -58,17 +58,6 @@ if errorlevel 1 (
 )
 
 echo.
-echo [3/5] Copiando script...
-
-scp "%SCRIPT%" "%USER%@%PC%:%REMOTE_DIR%/%SCRIPT%"
-
-if errorlevel 1 (
-    echo [ERRO] Falha ao copiar %SCRIPT%.
-    pause
-    exit /b 1
-)
-
-echo.
 echo [4/5] Preparando argumentos...
 
 set "ARGS=%*"
@@ -78,7 +67,7 @@ echo Argumentos: %ARGS%
 echo.
 echo [5/5] Executando remotamente...
 
-ssh "%USER%@%PC%" "start "" pyw.exe %REMOTE_DIR%/%SCRIPT% %ARGS%"
+ssh -p 2222 "%USER%@%PC%" "start "" pyw.exe %REMOTE_DIR%/%SCRIPT% %ARGS%"
 
 echo.
 echo ==========================================
